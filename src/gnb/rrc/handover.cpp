@@ -1,6 +1,12 @@
 //
-// This file is a part of UERANSIM project.
-// NTN Xn handover extension: RRC-level connected-mode mobility.
+// Xn handover extension for UERANSIM.
+// Copyright (c) 2026 Amir Naderi.
+//
+// Part of a modified version of UERANSIM by Ali Güngör
+// (https://github.com/aligungr/UERANSIM/), distributed under the same
+// license (AGPL-3.0). See README.md and LICENSE for details.
+//
+// RRC-level connected-mode mobility.
 //
 // Source side: builds the RRCReconfiguration carrying reconfigurationWithSync
 // that tells the UE to move to the target cell, without ever releasing it.

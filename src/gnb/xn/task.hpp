@@ -1,9 +1,12 @@
 //
-// This file is a part of UERANSIM project.
-// Copyright (c) 2023 ALİ GÜNGÖR.
+// Xn handover extension for UERANSIM.
+// Copyright (c) 2026 Amir Naderi.
 //
-// https://github.com/aligungr/UERANSIM/
-// See README, LICENSE, and CONTRIBUTING files for licensing details.
+// Part of a modified version of UERANSIM by Ali Güngör
+// (https://github.com/aligungr/UERANSIM/), distributed under the same
+// license (AGPL-3.0). See README.md and LICENSE for details.
+//
+// Xn interface between gNBs: TCP server and handover messages.
 //
 
 #pragma once

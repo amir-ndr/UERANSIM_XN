@@ -6,7 +6,7 @@ mcc: '999'          # Mobile Country Code value (must match the AMF's PLMN)
 mnc: '70'           # Mobile Network Code value (2 or 3 digits)
 
 nci: '0x000000010'  # NR Cell Identity (36-bit) -> gnbId 1 -> CLI name UERANSIM-gnb-999-70-1
-                    # NOTE: a handover TARGET's NCI must be <= 1007 (0x3EF), see XN_HANDOVER.md
+                    # NOTE: a handover TARGET's NCI must be <= 1007 (0x3EF), see README.md
 idLength: 32        # NR gNB ID length in bits [22...32]
 tac: 1              # Same TAC on both cells (intra-TA handover); must match the AMF's TAI
 

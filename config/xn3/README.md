@@ -19,7 +19,7 @@ three gNB configs so the first run exercises Xn + NGAP PathSwitch on its own.
 ## 0. One-time setup
 
 ```bash
-cd ~/5g-lab/UERANSIM
+cd UERANSIM            # the repository root
 make                                   # wipes build/ and rebuilds into build/
 ```
 
@@ -99,27 +99,27 @@ three are up before the UE starts, which cell it camps on is not deterministic.
 
 **Terminal 1 — gnb1**
 ```bash
-cd ~/5g-lab/UERANSIM
+cd UERANSIM            # the repository root
 sudo ./build/nr-gnb -c config/xn3/gnb1.yaml
 ```
 Wait for `NG Setup procedure is successful`.
 
 **Terminal 2 — ue1**
 ```bash
-cd ~/5g-lab/UERANSIM
+cd UERANSIM            # the repository root
 sudo ./build/nr-ue -c config/xn3/ue1.yaml
 ```
 Wait for `Connection setup for PDU session[1] is successful, TUN interface[uesimtun0, 10.45.0.x]`.
 
 **Terminal 3 — gnb2**
 ```bash
-cd ~/5g-lab/UERANSIM
+cd UERANSIM            # the repository root
 sudo ./build/nr-gnb -c config/xn3/gnb2.yaml
 ```
 
 **Terminal 4 — gnb3**
 ```bash
-cd ~/5g-lab/UERANSIM
+cd UERANSIM            # the repository root
 sudo ./build/nr-gnb -c config/xn3/gnb3.yaml
 ```
 
@@ -136,7 +136,7 @@ ss -lntp | grep 38422        # expect three LISTEN rows, one per 127.0.0.x
 
 **Terminal 5 — control**
 ```bash
-cd ~/5g-lab/UERANSIM
+cd UERANSIM            # the repository root
 ./build/nr-cli --dump                                        # all five nodes
 ./build/nr-cli UERANSIM-gnb-999-70-1 --exec "ue-list"        # UE is on gnb1
 ./build/nr-cli UERANSIM-gnb-999-70-2 --exec "ue-count"       # -> 0

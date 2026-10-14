@@ -1,6 +1,12 @@
 //
-// This file is a part of UERANSIM project.
-// NTN Xn handover extension: NGAP PathSwitchRequest to AMF (gnb2 side).
+// Xn handover extension for UERANSIM.
+// Copyright (c) 2026 Amir Naderi.
+//
+// Part of a modified version of UERANSIM by Ali Güngör
+// (https://github.com/aligungr/UERANSIM/), distributed under the same
+// license (AGPL-3.0). See README.md and LICENSE for details.
+//
+// NGAP PathSwitchRequest to AMF (gnb2 side).
 //
 
 #include "encode.hpp"

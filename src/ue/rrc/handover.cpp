@@ -1,6 +1,12 @@
 //
-// This file is a part of UERANSIM project.
-// NTN Xn handover extension: UE side of connected-mode mobility.
+// Xn handover extension for UERANSIM.
+// Copyright (c) 2026 Amir Naderi.
+//
+// Part of a modified version of UERANSIM by Ali Güngör
+// (https://github.com/aligungr/UERANSIM/), distributed under the same
+// license (AGPL-3.0). See README.md and LICENSE for details.
+//
+// UE side of connected-mode mobility.
 //
 // Executes an RRCReconfiguration carrying reconfigurationWithSync by moving the
 // serving cell to the target while staying RRC-CONNECTED. Nothing here touches
