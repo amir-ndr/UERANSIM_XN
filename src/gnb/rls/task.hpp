@@ -43,6 +43,10 @@ class GnbRlsTask : public NtsTask
     explicit GnbRlsTask(TaskBase *base);
     ~GnbRlsTask() override = default;
 
+    // UE-generated STI for a local RLS ueId, or 0 if unknown. Used to correlate
+    // a UE across the source and target gNB of an Xn handover.
+    uint64_t stiOf(int ueId);
+
   protected:
     void onStart() override;
     void onLoop() override;

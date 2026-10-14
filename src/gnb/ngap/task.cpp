@@ -40,6 +40,7 @@ void NgapTask::onStart()
         msg->associatedTask = this;
         m_base->sctpTask->push(std::move(msg));
     }
+
 }
 
 void NgapTask::onLoop()
@@ -66,6 +67,26 @@ void NgapTask::onLoop()
             handleRadioLinkFailure(w.ueId);
             break;
         }
+        }
+        break;
+    }
+    case NtsMessageType::GNB_XN_TO_NGAP: {
+        auto &w = dynamic_cast<NmGnbXnToNgap &>(*msg);
+        switch (w.present)
+        {
+        case NmGnbXnToNgap::TRIGGER_PATH_SWITCH:
+            sendPathSwitchRequest(w.ueId, w.amfUeNgapId, w.sessions, w.sliceSst, w.requestedUs, w.arrivedUs);
+            break;
+        }
+        break;
+    }
+    case NtsMessageType::GNB_CLI_TO_NGAP: {
+        auto &w = dynamic_cast<NmGnbCliToNgap &>(*msg);
+        switch (w.present)
+        {
+        case NmGnbCliToNgap::TRIGGER_XN_HANDOVER:
+            triggerXnHandover(w.ueId, w.targetGnbAddress, w.targetGnbPort, w.sliceSst);
+            break;
         }
         break;
     }

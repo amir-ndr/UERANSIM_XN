@@ -28,6 +28,9 @@ int GetIpVersion(const std::string &address);
 OctetString IpToOctetString(const std::string &address);
 std::string OctetStringToIp(const OctetString &address);
 int64_t CurrentTimeMillis();
+// Microsecond resolution. Needed where sub-millisecond intervals are measured
+// (Xn handover timing), since millisecond timestamps quantise those to 0 or 1.
+int64_t CurrentTimeMicros();
 TimeStamp CurrentTimeStamp();
 int NextId();
 int ParseInt(const std::string &str);

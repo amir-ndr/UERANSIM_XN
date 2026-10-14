@@ -56,6 +56,16 @@ static nr::gnb::GnbConfig *ReadConfigYaml()
         result->gtpAdvertiseIp = yaml::GetIpAddress(config, "gtpAdvertiseIp");
 
     result->ignoreStreamIds = yaml::GetBool(config, "ignoreStreamIds");
+
+    if (yaml::HasField(config, "dispatcherAddress"))
+        result->dispatcherAddress = yaml::GetIpAddress(config, "dispatcherAddress");
+    if (yaml::HasField(config, "dispatcherPort"))
+        result->dispatcherPort = static_cast<uint16_t>(yaml::GetInt32(config, "dispatcherPort", 1024, 65535));
+    if (yaml::HasField(config, "xnAddress"))
+        result->xnAddress = yaml::GetIpAddress(config, "xnAddress");
+    if (yaml::HasField(config, "xnPort"))
+        result->xnPort = static_cast<uint16_t>(yaml::GetInt32(config, "xnPort", 1024, 65535));
+
     result->pagingDrx = EPagingDrx::V128;
     result->name = "UERANSIM-gnb-" + std::to_string(result->plmn.mcc) + "-" + std::to_string(result->plmn.mnc) + "-" +
                    std::to_string(result->getGnbId()); // NOTE: Avoid using "/" dir separator character.

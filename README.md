@@ -7,6 +7,16 @@
 <img src="https://img.shields.io/badge/License-AGPL--3.0-green"/>
 </p>
 
+> [!NOTE]
+> **This is a modified version of [UERANSIM](https://github.com/aligungr/UERANSIM)
+> by Ali Güngör that adds Xn-based handover.** It is based on upstream commit
+> [`b4157fa`](https://github.com/aligungr/UERANSIM/commit/b4157fa) (v3.2.7 plus later
+> upstream fixes); everything except the Xn handover is upstream UERANSIM. A
+> connected UE can be handed over between gNBs that share one AMF (Xn preparation →
+> RRCReconfiguration with sync → NGAP Path Switch) without re-registering. See
+> **[XN_HANDOVER.md](XN_HANDOVER.md)** for a quick start (two gNBs, one UE), the
+> concept, and the full list of changes. The rest of this README is upstream's.
+
 **UERANSIM** <small>(pronounced "ju-i ræn sɪm")</small>, is the open source state-of-the-art 5G UE and RAN (gNodeB)
 simulator. UE and RAN can be considered as a 5G mobile phone and a base station in basic terms. The project can be used for
 testing 5G Core Network and studying 5G System.

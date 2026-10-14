@@ -37,6 +37,7 @@ extern "C"
     struct ASN_RRC_RRCSetup;
     struct ASN_RRC_RRCReject;
     struct ASN_RRC_RRCRelease;
+    struct ASN_RRC_RRCReconfiguration;
     struct ASN_RRC_Paging;
     struct ASN_RRC_MIB;
     struct ASN_RRC_SIB1;
@@ -102,6 +103,9 @@ class UeRrcTask : public NtsTask
     void performCycle();
     void switchState(ERrcState state);
     void onSwitchState(ERrcState oldState, ERrcState newState);
+
+    /* Xn handover (see rrc/handover.cpp) */
+    void receiveRrcReconfiguration(const ASN_RRC_RRCReconfiguration &msg);
 
     /* Idle Mode Operations */
     void performCellSelection();

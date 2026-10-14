@@ -11,6 +11,7 @@
 #include <lib/rrc/encode.hpp>
 #include <ue/rls/task.hpp>
 
+#include <asn/rrc/ASN_RRC_RRCReconfiguration.h>
 #include <asn/rrc/ASN_RRC_RRCReject.h>
 #include <asn/rrc/ASN_RRC_RRCSetup.h>
 #include <asn/rrc/ASN_RRC_UL-CCCH-Message.h>
@@ -186,6 +187,9 @@ void UeRrcTask::receiveRrcMessage(ASN_RRC_DL_DCCH_Message *msg)
         break;
     case ASN_RRC_DL_DCCH_MessageType__c1_PR_rrcRelease:
         receiveRrcRelease(*c1->choice.rrcRelease);
+        break;
+    case ASN_RRC_DL_DCCH_MessageType__c1_PR_rrcReconfiguration:
+        receiveRrcReconfiguration(*c1->choice.rrcReconfiguration);
         break;
     default:
         break;

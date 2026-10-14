@@ -1,0 +1,34 @@
+# ── gnb2 — Xn 3-gNB debug topology ────────────────────────────────────────────
+# Role: first handover target. Receives XnHandoverRequest on 127.0.0.2:38422,
+#       sends the NGAP PathSwitchRequest to the AMF, then replies UeContextRelease.
+
+mcc: '999'          # Mobile Country Code value
+mnc: '70'           # Mobile Network Code value (2 or 3 digits)
+
+nci: '0x000000020'  # NR Cell Identity (36-bit) -> gnbId 2
+idLength: 32        # NR gNB ID length in bits [22...32]
+tac: 1              # Same TAC on all three cells: intra-TA, so no TAU on reselect
+
+linkIp: 127.0.0.2   # Radio Link Simulation (RLS)
+ngapIp: 127.0.0.2   # N2
+gtpIp: 127.0.0.2    # N3
+
+# List of AMF address information
+amfConfigs:
+  - address: 127.0.0.5
+    port: 38412
+
+# List of supported S-NSSAIs by this gNB
+slices:
+  - sst: 1
+
+# Indicates whether or not SCTP stream number errors should be ignored.
+ignoreStreamIds: true
+
+# ── Xn handover config (NTN simulation) ───────────────────────────────────────
+# Uncomment the dispatcher lines to fold the chain-selection RTT into the
+# prep+psw column of xn_ho_latency.csv.
+# dispatcherAddress: 127.0.0.1
+# dispatcherPort: 9000
+xnAddress: 127.0.0.2          # This gNB's Xn listen IP
+xnPort: 38422                 # This gNB's Xn listen port

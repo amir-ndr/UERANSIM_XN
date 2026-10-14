@@ -132,4 +132,9 @@ void GnbRlsTask::onQuit()
     delete m_ctlTask;
 }
 
+uint64_t GnbRlsTask::stiOf(int ueId)
+{
+    return m_udpTask->stiOf(ueId);
+}
+
 } // namespace nr::gnb

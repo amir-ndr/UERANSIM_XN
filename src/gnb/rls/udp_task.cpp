@@ -101,20 +101,30 @@ void RlsUdpTask::receiveRlsPdu(const InetAddress &addr, std::unique_ptr<rls::Rls
             return;
         }
 
-        if (m_stiToUe.count(msg->sti))
+        bool isNewUe = false;
+        int ueId;
+
         {
-            int ueId = m_stiToUe[msg->sti];
+            std::lock_guard<std::mutex> lock{m_ueMapMutex};
+
+            if (m_stiToUe.count(msg->sti))
+            {
+                ueId = m_stiToUe[msg->sti];
+            }
+            else
+            {
+                ueId = ++m_newIdCounter;
+                m_stiToUe[msg->sti] = ueId;
+                isNewUe = true;
+            }
+
+            m_ueMap[ueId].sti = msg->sti;
             m_ueMap[ueId].address = addr;
             m_ueMap[ueId].lastSeen = utils::CurrentTimeMillis();
         }
-        else
+
+        if (isNewUe)
         {
-            int ueId = ++m_newIdCounter;
-
-            m_stiToUe[msg->sti] = ueId;
-            m_ueMap[ueId].address = addr;
-            m_ueMap[ueId].lastSeen = utils::CurrentTimeMillis();
-
             auto w = std::make_unique<NmGnbRlsToRls>(NmGnbRlsToRls::SIGNAL_DETECTED);
             w->ueId = ueId;
             m_ctlTask->push(std::move(w));
@@ -127,14 +137,21 @@ void RlsUdpTask::receiveRlsPdu(const InetAddress &addr, std::unique_ptr<rls::Rls
         return;
     }
 
-    if (!m_stiToUe.count(msg->sti))
+    int ueId;
     {
-        // if no HB received yet, and the message is not HB, then ignore the message
-        return;
+        std::lock_guard<std::mutex> lock{m_ueMapMutex};
+
+        auto it = m_stiToUe.find(msg->sti);
+        if (it == m_stiToUe.end())
+        {
+            // if no HB received yet, and the message is not HB, then ignore the message
+            return;
+        }
+        ueId = it->second;
     }
 
     auto w = std::make_unique<NmGnbRlsToRls>(NmGnbRlsToRls::RECEIVE_RLS_MESSAGE);
-    w->ueId = m_stiToUe[msg->sti];
+    w->ueId = ueId;
     w->msg = std::move(msg);
     m_ctlTask->push(std::move(w));
 }
@@ -150,22 +167,23 @@ void RlsUdpTask::sendRlsPdu(const InetAddress &addr, const rls::RlsMessage &msg)
 void RlsUdpTask::heartbeatCycle(int64_t time)
 {
     std::set<int> lostUeId{};
-    std::set<uint64_t> lostSti{};
 
-    for (auto &item : m_ueMap)
     {
-        if (time - item.second.lastSeen > HEARTBEAT_THRESHOLD)
+        std::lock_guard<std::mutex> lock{m_ueMapMutex};
+
+        for (auto &item : m_ueMap)
         {
-            lostUeId.insert(item.first);
-            lostSti.insert(item.second.sti);
+            if (time - item.second.lastSeen > HEARTBEAT_THRESHOLD)
+                lostUeId.insert(item.first);
         }
+
+        // NOTE: the sti -> ueId mapping is deliberately kept. A UE that briefly
+        // loses signal must come back with the SAME ueId, otherwise its RRC,
+        // NGAP and GTP contexts (all keyed by that id) are orphaned and the
+        // downlink dies. SIGNAL_LOST does not tear those contexts down.
+        for (int ueId : lostUeId)
+            m_ueMap.erase(ueId);
     }
-
-    for (uint64_t sti : lostSti)
-        m_stiToUe.erase(sti);
-
-    for (int ueId : lostUeId)
-        m_ueMap.erase(ueId);
 
     for (int ueId : lostUeId)
     {
@@ -184,18 +202,40 @@ void RlsUdpTask::send(int ueId, const rls::RlsMessage &msg)
 {
     if (ueId == 0)
     {
-        for (auto &ue : m_ueMap)
-            send(ue.first, msg);
+        std::vector<int> allUeIds{};
+        {
+            std::lock_guard<std::mutex> lock{m_ueMapMutex};
+            for (auto &ue : m_ueMap)
+                allUeIds.push_back(ue.first);
+        }
+
+        for (int id : allUeIds)
+            send(id, msg);
         return;
     }
 
-    if (!m_ueMap.count(ueId))
+    InetAddress address{};
     {
-        // ignore the message
-        return;
+        std::lock_guard<std::mutex> lock{m_ueMapMutex};
+
+        auto it = m_ueMap.find(ueId);
+        if (it == m_ueMap.end())
+        {
+            // ignore the message
+            return;
+        }
+        address = it->second.address;
     }
 
-    sendRlsPdu(m_ueMap[ueId].address, msg);
+    sendRlsPdu(address, msg);
+}
+
+uint64_t RlsUdpTask::stiOf(int ueId)
+{
+    std::lock_guard<std::mutex> lock{m_ueMapMutex};
+
+    auto it = m_ueMap.find(ueId);
+    return it == m_ueMap.end() ? 0 : it->second.sti;
 }
 
 } // namespace nr::gnb

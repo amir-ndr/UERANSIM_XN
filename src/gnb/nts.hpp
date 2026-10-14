@@ -166,11 +166,16 @@ struct NmGnbNgapToRrc : NtsMessage
         NAS_DELIVERY,
         AN_RELEASE,
         PAGING,
+        XN_HANDOVER_COMMAND,
     } present;
 
     // NAS_DELIVERY
     // AN_RELEASE
+    // XN_HANDOVER_COMMAND
     int ueId{};
+
+    // XN_HANDOVER_COMMAND: NCI of the target cell the UE must move to
+    int64_t targetNci{};
 
     // NAS_DELIVERY
     OctetString pdu{};
@@ -294,6 +299,63 @@ struct NmGnbStatusUpdate : NtsMessage
     bool isNgapUp{};
 
     explicit NmGnbStatusUpdate(const int what) : NtsMessage(NtsMessageType::GNB_STATUS_UPDATE), what(what)
+    {
+    }
+};
+
+struct NmGnbXnToNgap : NtsMessage
+{
+    enum PR
+    {
+        TRIGGER_PATH_SWITCH,
+    } present;
+
+    struct SessionInfo
+    {
+        int psi{};
+        uint32_t upTeid{};
+        OctetString upAddr{};
+        std::vector<long> qfis{};
+    };
+
+    int64_t amfUeNgapId{};
+    std::vector<SessionInfo> sessions;
+
+    // Local RLS/RRC ueId of the arrived UE. The NGAP context is created with
+    // this id so that the path-switched context is the same one the UE is
+    // actually connected through.
+    int ueId{};
+    int sliceSst{};
+
+    // Timestamps for the handover latency row (microseconds since epoch):
+    // when the XnHandoverRequest arrived, and when the UE completed the move.
+    int64_t requestedUs{};
+    int64_t arrivedUs{};
+
+    explicit NmGnbXnToNgap(PR present)
+        : NtsMessage(NtsMessageType::GNB_XN_TO_NGAP), present(present)
+    {
+    }
+};
+
+// Xn handover request coming from the CLI. It is deliberately handled as a
+// message on the NGAP task rather than inline in the CLI handler: the CLI
+// handler runs with RRC/RLS/GTP paused, and a paused task only resumes on a
+// 20ms polling boundary, which would add ~10ms of pure simulator latency
+// between the handover being triggered and the command reaching the UE.
+struct NmGnbCliToNgap : NtsMessage
+{
+    enum PR
+    {
+        TRIGGER_XN_HANDOVER,
+    } present;
+
+    int ueId{};
+    std::string targetGnbAddress{};
+    uint16_t targetGnbPort{};
+    int sliceSst{};
+
+    explicit NmGnbCliToNgap(PR present) : NtsMessage(NtsMessageType::GNB_CLI_TO_NGAP), present(present)
     {
     }
 };

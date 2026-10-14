@@ -11,6 +11,7 @@
 #include <gnb/rls/task.hpp>
 #include <lib/rrc/encode.hpp>
 
+#include <asn/rrc/ASN_RRC_RRCReconfigurationComplete.h>
 #include <asn/rrc/ASN_RRC_UL-CCCH-Message.h>
 #include <asn/rrc/ASN_RRC_UL-DCCH-Message.h>
 
@@ -190,7 +191,8 @@ void GnbRrcTask::receiveRrcMessage(int ueId, ASN_RRC_UL_DCCH_Message *msg)
     case ASN_RRC_UL_DCCH_MessageType__c1_PR_measurementReport:
         break; // TODO
     case ASN_RRC_UL_DCCH_MessageType__c1_PR_rrcReconfigurationComplete:
-        break; // TODO
+        receiveRrcReconfigurationComplete(ueId, *c1->choice.rrcReconfigurationComplete);
+        break;
     case ASN_RRC_UL_DCCH_MessageType__c1_PR_rrcSetupComplete:
         receiveRrcSetupComplete(ueId, *c1->choice.rrcSetupComplete);
         break;

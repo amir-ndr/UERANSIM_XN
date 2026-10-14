@@ -1,0 +1,64 @@
+# ── Reference AMF config for the Xn 3-gNB debug topology ──────────────────────
+# This mirrors the parts of /etc/open5gs/amf.yaml that MUST line up with
+# config/xn3/gnb{1,2,3}.yaml and config/xn3/ue1.yaml. Copy the ngap / guami /
+# tai / plmn_support blocks into your installed amf.yaml; leave the rest of the
+# file (logger, sbi, metrics, security, network_name, amf_name) as installed.
+#
+#   PLMN            999 / 70        <- gnb mcc/mnc and ue mcc/mnc
+#   TAC             1               <- gnb tac; identical on all three cells
+#   S-NSSAI         sst 1           <- gnb slices, ue sessions/configured-nssai
+#   NGAP bind       127.0.0.5:38412 <- gnb amfConfigs.address/port
+#
+# All three gNBs share one AMF on purpose: the Xn path switch is only meaningful
+# when source and target are served by the same AMF (no AMF relocation path is
+# implemented in this fork).
+
+amf:
+  sbi:
+    server:
+      - address: 127.0.0.5
+        port: 7777
+    client:
+      nrf:
+        - uri: http://127.0.0.10:7777
+      scp:
+        - uri: http://127.0.0.200:7777
+
+  ngap:
+    server:
+      - address: 127.0.0.5      # gnb amfConfigs.address must match this
+
+  metrics:
+    server:
+      - address: 127.0.0.5
+        port: 9090
+
+  guami:
+    - plmn_id:
+        mcc: 999
+        mnc: 70
+      amf_id:
+        region: 2
+        set: 1
+
+  tai:
+    - plmn_id:
+        mcc: 999
+        mnc: 70
+      tac: 1                    # gnb tac must match this
+
+  plmn_support:
+    - plmn_id:
+        mcc: 999
+        mnc: 70
+      s_nssai:
+        - sst: 1                # gnb slices / ue nssai must match this
+
+  security:
+    integrity_order: [ NIA2, NIA1, NIA0 ]
+    ciphering_order: [ NEA0, NEA1, NEA2 ]
+
+  network_name:
+    full: Open5GS
+
+  amf_name: open5gs-amf0

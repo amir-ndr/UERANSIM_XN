@@ -9,6 +9,7 @@
 #pragma once
 
 #include <cstdint>
+#include <mutex>
 #include <unordered_map>
 #include <vector>
 
@@ -41,6 +42,10 @@ class RlsUdpTask : public NtsTask
     std::unordered_map<int, UeInfo> m_ueMap;
     int m_newIdCounter;
 
+    // Guards m_stiToUe/m_ueMap. They are mutated on this task's thread, but
+    // stiOf() is called from the NGAP and RRC task threads during Xn handover.
+    std::mutex m_ueMapMutex;
+
   public:
     explicit RlsUdpTask(TaskBase *base, uint64_t sti, Vector3 phyLocation);
     ~RlsUdpTask() override = default;
@@ -58,6 +63,11 @@ class RlsUdpTask : public NtsTask
   public:
     void initialize(NtsTask *ctlTask);
     void send(int ueId, const rls::RlsMessage &msg);
+
+    // Returns the UE-generated STI for a local RLS ueId, or 0 if unknown.
+    // The STI is the only UE identity shared across gNBs, so it is what
+    // correlates a UE between the source and target of an Xn handover.
+    uint64_t stiOf(int ueId);
 };
 
 } // namespace nr::gnb

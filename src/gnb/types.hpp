@@ -30,6 +30,7 @@ class NgapTask;
 class GnbRrcTask;
 class GnbRlsTask;
 class SctpTask;
+class XnTask;
 
 enum class EAmfState
 {
@@ -135,6 +136,23 @@ struct NgapUeContext
     int downlinkStream{};
     AggregateMaximumBitRate ueAmbr{};
     std::set<int> pduSessions{};
+
+    // PDU session tunnel info saved here so gnb1 can include it in XnHandoverRequest
+    // and gnb2 can use it when sending NGAP PathSwitchRequest to AMF
+    struct PduSessionXnInfo
+    {
+        uint32_t upTeid{};      // UPF uplink TEID
+        OctetString upAddr{};   // UPF uplink address (raw BIT_STRING bytes)
+        uint32_t downTeid{};    // gNB downlink TEID (allocated locally)
+        std::vector<long> qfis{};
+    };
+    std::map<int, PduSessionXnInfo> xnSessionInfo; // psi → info
+
+    // Xn handover bookkeeping (target side), used for the latency row:
+    // when the XnHandoverRequest arrived and when the UE completed its move.
+    int xnSliceSst{};
+    int64_t xnRequestedUs{};
+    int64_t xnArrivedUs{};
 
     explicit NgapUeContext(int ctxId) : ctxId(ctxId)
     {
@@ -315,6 +333,12 @@ struct GnbConfig
     std::optional<std::string> gtpAdvertiseIp{};
     bool ignoreStreamIds{};
 
+    /* Xn handover config (NTN simulation) */
+    std::string dispatcherAddress{};  // Python dispatcher IP
+    uint16_t dispatcherPort{9000};    // Python dispatcher port
+    std::string xnAddress{};          // This gNB's Xn listen IP
+    uint16_t xnPort{38422};           // This gNB's Xn listen port
+
     /* Assigned by program */
     std::string name{};
     EPagingDrx pagingDrx{};
@@ -344,6 +368,7 @@ struct TaskBase
     GnbRrcTask *rrcTask{};
     SctpTask *sctpTask{};
     GnbRlsTask *rlsTask{};
+    XnTask *xnTask{};
 };
 
 Json ToJson(const GnbStatusInfo &v);

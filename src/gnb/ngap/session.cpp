@@ -238,6 +238,21 @@ std::optional<NgapCause> NgapTask::setupPduSessionResource(NgapUeContext *ue, Pd
     resource->downTunnel.address = utils::IpToOctetString(gtpIp);
     resource->downTunnel.teid = ++m_downlinkTeidCounter;
 
+    // Save tunnel + QFI info so triggerXnHandover can include it in XnHandoverRequest
+    {
+        NgapUeContext::PduSessionXnInfo xnInfo;
+        xnInfo.upTeid   = resource->upTunnel.teid;
+        xnInfo.upAddr   = resource->upTunnel.address.copy();
+        xnInfo.downTeid = resource->downTunnel.teid;
+        if (resource->qosFlows)
+        {
+            auto &qlist = resource->qosFlows->list;
+            for (int i = 0; i < qlist.count; i++)
+                xnInfo.qfis.push_back(qlist.array[i]->qosFlowIdentifier);
+        }
+        ue->xnSessionInfo[resource->psi] = std::move(xnInfo);
+    }
+
     auto w = std::make_unique<NmGnbNgapToGtp>(NmGnbNgapToGtp::SESSION_CREATE);
     w->resource = resource;
     m_base->gtpTask->push(std::move(w));

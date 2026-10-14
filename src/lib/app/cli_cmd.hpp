@@ -29,13 +29,20 @@ struct GnbCliCommand
         UE_LIST,
         UE_COUNT,
         UE_RELEASE_REQ,
+        XN_HANDOVER,
     } present;
 
     // AMF_INFO
     int amfId{};
 
     // UE_RELEASE_REQ
+    // XN_HANDOVER
     int ueId{};
+
+    // XN_HANDOVER
+    std::string targetGnbAddress{};  // target gNB Xn IP
+    uint16_t targetGnbPort{38422};   // target gNB Xn port
+    int sliceSst{1};                 // UE slice SST (1=eMBB, 2=URLLC)
 
     explicit GnbCliCommand(PR present) : present(present)
     {

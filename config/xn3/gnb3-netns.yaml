@@ -1,0 +1,33 @@
+# ── gnb3 — Xn 3-gNB debug topology ────────────────────────────────────────────
+# Role: second handover target. Lets you chain gnb1 -> gnb2 -> gnb3 and check
+#       that a second path switch on a UE that has already been switched once
+#       behaves (this is where the per-task path-switch latch gets stressed).
+
+mcc: '999'          # Mobile Country Code value
+mnc: '70'           # Mobile Network Code value (2 or 3 digits)
+
+nci: '0x000000030'  # NR Cell Identity (36-bit) -> gnbId 3
+idLength: 32        # NR gNB ID length in bits [22...32]
+tac: 1              # Same TAC on all three cells: intra-TA, so no TAU on reselect
+
+linkIp: 10.200.0.13   # Radio Link Simulation (RLS)
+ngapIp: 127.0.0.3   # N2
+gtpIp: 127.0.0.3    # N3
+
+# List of AMF address information
+amfConfigs:
+  - address: 127.0.0.5
+    port: 38412
+
+# List of supported S-NSSAIs by this gNB
+slices:
+  - sst: 1
+
+# Indicates whether or not SCTP stream number errors should be ignored.
+ignoreStreamIds: true
+
+# ── Xn handover config (NTN simulation) ───────────────────────────────────────
+# dispatcherAddress: 127.0.0.1
+# dispatcherPort: 9000
+xnAddress: 127.0.0.3          # This gNB's Xn listen IP
+xnPort: 38422                 # This gNB's Xn listen port

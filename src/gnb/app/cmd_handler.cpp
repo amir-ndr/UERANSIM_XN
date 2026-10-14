@@ -154,6 +154,26 @@ void GnbCmdHandler::handleCmdImpl(NmGnbCliCommand &msg)
         }
         break;
     }
+    case app::GnbCliCommand::XN_HANDOVER: {
+        if (m_base->ngapTask->m_ueCtx.count(msg.cmd->ueId) == 0)
+            sendError(msg.address, "UE not found with given ID");
+        else
+        {
+            // Run the handover on the NGAP task instead of here. This handler
+            // holds RRC/RLS/GTP paused, and a paused task only resumes on a
+            // 20ms polling boundary, so doing it inline would inject ~10ms of
+            // simulator latency into the measured handover time.
+            auto w = std::make_unique<NmGnbCliToNgap>(NmGnbCliToNgap::TRIGGER_XN_HANDOVER);
+            w->ueId = msg.cmd->ueId;
+            w->targetGnbAddress = msg.cmd->targetGnbAddress;
+            w->targetGnbPort = msg.cmd->targetGnbPort;
+            w->sliceSst = msg.cmd->sliceSst;
+            m_base->ngapTask->push(std::move(w));
+
+            sendResult(msg.address, "Xn handover triggered");
+        }
+        break;
+    }
     }
 }
 

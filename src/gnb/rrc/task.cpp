@@ -11,6 +11,7 @@
 #include <gnb/nts.hpp>
 #include <gnb/rls/task.hpp>
 #include <lib/rrc/encode.hpp>
+#include <utils/common.hpp>
 
 #include <asn/rrc/ASN_RRC_DLInformationTransfer-IEs.h>
 #include <asn/rrc/ASN_RRC_DLInformationTransfer.h>
@@ -64,6 +65,10 @@ void GnbRrcTask::onLoop()
         }
         case NmGnbNgapToRrc::AN_RELEASE: {
             releaseConnection(w.ueId);
+            break;
+        }
+        case NmGnbNgapToRrc::XN_HANDOVER_COMMAND: {
+            sendXnHandoverCommand(w.ueId, w.targetNci);
             break;
         }
         case NmGnbNgapToRrc::PAGING:

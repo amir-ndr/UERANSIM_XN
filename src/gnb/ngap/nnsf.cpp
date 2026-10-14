@@ -13,17 +13,27 @@ namespace nr::gnb
 
 NgapAmfContext *NgapTask::selectAmf(int ueId, int32_t &requestedSliceType)
 {
+    NgapAmfContext *anyConnected = nullptr;
+
     for (auto &amf : m_amfCtx) {
+        if (amf.second->state != EAmfState::CONNECTED)
+            continue;
+        if (anyConnected == nullptr)
+            anyConnected = amf.second;
+
+        if (requestedSliceType < 0)
+            continue; // no slice filter — collect fallback, keep looping
+
         for (const auto &plmnSupport : amf.second->plmnSupportList) {
             for (const auto &singleSlice : plmnSupport->sliceSupportList.slices) {
-                int32_t supportedSliceType = static_cast<int32_t>(singleSlice.sst);
-                if (supportedSliceType == requestedSliceType) {
+                if (static_cast<int32_t>(singleSlice.sst) == requestedSliceType)
                     return amf.second;
-                }
             }
         }
     }
-    return nullptr;
+
+    // Service Request / messages without NSSAI: use any connected AMF
+    return anyConnected;
 }
 
 NgapAmfContext *NgapTask::selectNewAmfForReAllocation(int ueId, int initiatedAmfId, int amfSetId)

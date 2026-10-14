@@ -152,6 +152,7 @@ static OrderedMap<std::string, CmdEntry> g_gnbCmdEntries = {
     {"ue-list", {"List all UEs associated with the gNB", "", DefaultDesc, false}},
     {"ue-count", {"Print the total number of UEs connected the this gNB", "", DefaultDesc, false}},
     {"ue-release", {"Request a UE context release for the given UE", "<ue-id>", DefaultDesc, false}},
+    {"xn-handover", {"Trigger Xn-based NTN handover for a UE to a target gNB", "<ue-id> <target-ip> [target-port] [slice-sst]", DefaultDesc, true}},
 };
 
 static OrderedMap<std::string, CmdEntry> g_ueCmdEntries = {
@@ -214,6 +215,31 @@ static std::unique_ptr<GnbCliCommand> GnbCliParseImpl(const std::string &subCmd,
         cmd->ueId = utils::ParseInt(options.getPositional(0));
         if (cmd->ueId <= 0)
             CMD_ERR("Invalid UE ID")
+        return cmd;
+    }
+    else if (subCmd == "xn-handover")
+    {
+        auto cmd = std::make_unique<GnbCliCommand>(GnbCliCommand::XN_HANDOVER);
+        if (options.positionalCount() < 2)
+            CMD_ERR("UE ID and target gNB IP are required: xn-handover <ue-id> <target-ip> [target-port] [slice-sst]")
+        cmd->ueId = utils::ParseInt(options.getPositional(0));
+        if (cmd->ueId <= 0)
+            CMD_ERR("Invalid UE ID")
+        cmd->targetGnbAddress = options.getPositional(1);
+        if (cmd->targetGnbAddress.empty())
+            CMD_ERR("Invalid target gNB address")
+        if (options.positionalCount() >= 3)
+        {
+            cmd->targetGnbPort = static_cast<uint16_t>(utils::ParseInt(options.getPositional(2)));
+            if (cmd->targetGnbPort == 0)
+                CMD_ERR("Invalid target gNB port")
+        }
+        if (options.positionalCount() >= 4)
+        {
+            cmd->sliceSst = utils::ParseInt(options.getPositional(3));
+            if (cmd->sliceSst <= 0)
+                CMD_ERR("Invalid slice SST")
+        }
         return cmd;
     }
 

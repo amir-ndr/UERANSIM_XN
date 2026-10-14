@@ -156,6 +156,12 @@ int64_t utils::CurrentTimeMillis()
     return now;
 }
 
+int64_t utils::CurrentTimeMicros()
+{
+    auto sinceEpoch = std::chrono::system_clock::now().time_since_epoch();
+    return std::chrono::duration_cast<std::chrono::microseconds>(sinceEpoch).count();
+}
+
 TimeStamp utils::CurrentTimeStamp()
 {
     int64_t tms = CurrentTimeMillis();

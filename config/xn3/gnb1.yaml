@@ -1,0 +1,36 @@
+# ── gnb1 — Xn 3-gNB debug topology ────────────────────────────────────────────
+# Role: initial serving cell. The UE camps here first, handovers are triggered
+#       from this node's CLI (nr-cli UERANSIM-gnb-999-70-1 --exec "xn-handover ...")
+
+mcc: '999'          # Mobile Country Code value
+mnc: '70'           # Mobile Network Code value (2 or 3 digits)
+
+nci: '0x000000010'  # NR Cell Identity (36-bit) -> gnbId 1
+idLength: 32        # NR gNB ID length in bits [22...32]
+tac: 1              # Same TAC on all three cells: intra-TA, so no TAU on reselect
+
+linkIp: 127.0.0.1   # Radio Link Simulation (RLS)
+ngapIp: 127.0.0.1   # N2
+gtpIp: 127.0.0.1    # N3
+
+# List of AMF address information
+amfConfigs:
+  - address: 127.0.0.5
+    port: 38412
+
+# List of supported S-NSSAIs by this gNB
+slices:
+  - sst: 1
+
+# Indicates whether or not SCTP stream number errors should be ignored.
+ignoreStreamIds: true
+
+# ── Xn handover config (NTN simulation) ───────────────────────────────────────
+# dispatcherAddress / dispatcherPort are only used when this gNB acts as the
+# TARGET of a handover. Left commented out for the bring-up run so the Xn path
+# is exercised on its own (XnTask logs "no dispatcher configured" and reports
+# pswLatencyMs = 0). Uncomment once the plain Xn+NGAP flow is verified.
+# dispatcherAddress: 127.0.0.1
+# dispatcherPort: 9000
+xnAddress: 127.0.0.1          # This gNB's Xn listen IP
+xnPort: 38422                 # This gNB's Xn listen port

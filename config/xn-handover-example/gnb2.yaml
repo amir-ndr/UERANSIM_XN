@@ -1,0 +1,31 @@
+# ── gnb2 — Xn handover example: the TARGET cell ───────────────────────────────
+# Receives the XnHandoverRequest on 127.0.0.2:38422, waits for the UE to arrive,
+# then sends the NGAP PathSwitchRequest to the AMF.
+
+mcc: '999'          # Mobile Country Code value (must match the AMF's PLMN)
+mnc: '70'           # Mobile Network Code value (2 or 3 digits)
+
+nci: '0x000000020'  # NR Cell Identity (36-bit) -> gnbId 2 -> CLI name UERANSIM-gnb-999-70-2
+                    # = 32 decimal, within the handover-target limit of 1007
+idLength: 32        # NR gNB ID length in bits [22...32]
+tac: 1              # Same TAC as gnb1
+
+linkIp: 127.0.0.2   # Radio Link Simulation (RLS): the UE's gnbSearchList points here
+ngapIp: 127.0.0.2   # N2 (towards the AMF)
+gtpIp: 127.0.0.2    # N3 (towards the UPF)
+
+# AMF address: must match ngap.server.address in Open5GS amf.yaml
+amfConfigs:
+  - address: 127.0.0.5
+    port: 38412
+
+# Supported S-NSSAIs (must match plmn_support.s_nssai in the AMF)
+slices:
+  - sst: 1
+
+# Indicates whether or not SCTP stream number errors should be ignored.
+ignoreStreamIds: true
+
+# ── Xn handover (added by this fork) ──────────────────────────────────────────
+xnAddress: 127.0.0.2          # This gNB's Xn listen IP (omit to disable Xn)
+xnPort: 38422                 # This gNB's Xn listen port

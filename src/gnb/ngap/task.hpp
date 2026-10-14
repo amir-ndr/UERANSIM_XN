@@ -34,6 +34,7 @@ extern "C"
     struct ASN_NGAP_OverloadStop;
     struct ASN_NGAP_PDUSessionResourceReleaseCommand;
     struct ASN_NGAP_Paging;
+    struct ASN_NGAP_PathSwitchRequestAcknowledge;
 }
 
 namespace nr::gnb
@@ -55,6 +56,7 @@ class NgapTask : public NtsTask
     int64_t m_ueNgapIdCounter;
     uint32_t m_downlinkTeidCounter;
     bool m_isInitialized;
+
 
     friend class GnbCmdHandler;
 
@@ -124,6 +126,15 @@ class NgapTask : public NtsTask
     /* Radio resource control */
     void handleRadioLinkFailure(int ueId);
     void receivePaging(int amfId, ASN_NGAP_Paging *msg);
+
+    /* Xn-based NTN handover */
+    void triggerXnHandover(int ueId, const std::string &targetGnbAddress,
+                           uint16_t targetGnbPort, int sliceSst);
+    void sendPathSwitchRequest(int ueId, int64_t amfUeNgapId,
+                               const std::vector<NmGnbXnToNgap::SessionInfo> &sessions,
+                               int sliceSst, int64_t requestedUs, int64_t arrivedUs);
+    void receivePathSwitchRequestAcknowledge(int amfId,
+                                             ASN_NGAP_PathSwitchRequestAcknowledge *msg);
 };
 
 } // namespace nr::gnb

@@ -10,6 +10,7 @@
 
 #include <gnb/ngap/task.hpp>
 #include <lib/rrc/encode.hpp>
+#include <utils/common.hpp>
 
 #include <asn/ngap/ASN_NGAP_FiveG-S-TMSI.h>
 #include <asn/rrc/ASN_RRC_BCCH-BCH-Message.h>
